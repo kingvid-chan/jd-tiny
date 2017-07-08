@@ -8,7 +8,6 @@ const imgFilesList = IMGFilesList.get('imgFilesList').value();
 module.exports = function(){
 	return new Promise(function(Resolve, Reject){
 		console.log(chalk.yellow('开始替换图片链接...'));
-
 		getFilePathRecursive(path.resolve(__dirname, '../build/project'),'(css|html)').then(function(results){
 		    var tasks = [];
 		    results.forEach(function(path){

@@ -39,21 +39,12 @@ module.exports = function(env) {
                 use: [
                     'file-loader?name=project/[name].[ext]',
                     'extract-loader',
-                    'html-loader'
+                    'html-loader?minimize=true&removeComments=true&collapseWhitespace=true'
                 ]
             }, {
                 test: /\.js$/,
-                exclude: /.entry.js/,
+                exclude: /webpack\.entry\.js/,
                 loader: 'file-loader?name=project/js/[name].[ext]'
-            },{
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['env']
-                    }
-                }
             }]
         },
         plugins: [

@@ -66,7 +66,7 @@ app.post('/upload', upload.fields([{ name: 'html' }, { name: 'images' }, { name:
     }
 
     //删除projects文件夹
-    shell.rm('-rf', './build/');
+    shell.rm('-rf', path.resolve(__dirname, './build'));
     //上传图片
     upload(homeDir);
 
@@ -80,19 +80,20 @@ app.post('/upload', upload.fields([{ name: 'html' }, { name: 'images' }, { name:
                 console.log(chalk.yellow('替换完毕！'));
                 folderName = homeDir;
                 //删除projects文件夹
-                shell.rm('-rf', './projects/');
+                shell.rm('-rf', path.resolve(__dirname, './projects'));
 
                 console.log(chalk.blue('打包完成'));
                 res.send({ success: true, message: '打包完成' });
             });
-        }).catch(function() {
-            console.log(chalk.bold.red('项目打包出错！'));
+        }).catch(function(err) {
+            console.log(chalk.red('打包出错'));
+            res.send({ success: false, message: err?err.toString():'打包出错'});
         });
     }
 });
 app.get('/download', function(req, res, next) {
-	res.set('Content-Type', 'application/zip')
-	res.set('Content-Disposition', 'attachment; filename=' + folderName + '.zip');
+    res.set('Content-Type', 'application/zip')
+    res.set('Content-Disposition', 'attachment; filename=' + folderName + '.zip');
     var copyFrom = path.resolve(__dirname, "./build/project"),
         copyTo = path.resolve(__dirname, folderName + '.zip');
 
@@ -127,5 +128,5 @@ app.get('/download', function(req, res, next) {
 app.listen(8088, function() { console.log('Local Server is running on port 8088 !'); });
 
 if (program) {
-	opn('http://localhost:8088');
+    opn('http://localhost:8088');
 }

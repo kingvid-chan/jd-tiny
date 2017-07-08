@@ -15,9 +15,9 @@ var tinyKeyIndex = 0;
 
 module.exports.upload = function(params) {
     var homeDir = params.homeDir,
-        _path = path.resolve(__dirname, '../projects/' + homeDir),
+        // _path = path.resolve(__dirname, '../projects/' + homeDir),
         entryText = [
-            'var requireContext = require.context("' + _path + '", true, /\.(css|html|js|scss)$/i);',
+            'var requireContext = require.context("../projects/' + homeDir + '", true, /\.(css|html|js|scss)$/i);',
             'requireContext.keys().forEach(function(key){requireContext(key);});'
         ].join('\n');
 
@@ -32,9 +32,13 @@ module.exports.upload = function(params) {
                     }));
                     if (err) {
                         throw new gutil.PluginError('webpack:build', err);
+                        Reject(err);
+                    } else if (stats.compilation.errors.length) {
+                        Reject(stats.compilation.errors);
                     } else {
                         console.log(chalk.blue('生成目录完成...'));
-                        fs.readFile(path.resolve(__dirname, '../build/fileslist.md'), 'utf-8', function(err, imgList) {
+                        var fileslistPath = path.resolve(__dirname, '../build/fileslist.md');
+                        fs.readFile(fileslistPath, 'utf-8', function(err, imgList) {
                             if (err) { console.log(err); }
                             imgList = JSON.parse(imgList);
                             imgLength = imgList.length;
@@ -57,7 +61,7 @@ module.exports.upload = function(params) {
                                             Resolve();
                                         }
                                     } else {
-                                        tiny(tinyKeyIndex, '../build/cacheImg/', imgObj.hashName).then(function(result){
+                                        tiny(tinyKeyIndex, '../build/cacheImg/', imgObj.hashName).then(function(result) {
                                             tinyKeyIndex = result;
                                             upload(imgObj).then(function() {
                                                 console.log(chalk.green('所有的图片已上传完毕！'));
@@ -84,12 +88,12 @@ module.exports.upload = function(params) {
                                                     IMGFilesList.get('imgFilesList').push({ "imgName": imgObj.imgName, "url": result[filename], "hash": imgObj.hash }).write();
                                                     console.log(chalk.green('uploaded image:', imgObj.imgName, 'success!'));
                                                 }
-                                            }else{
+                                            } else {
                                                 console.log(chalk.bold.red('上传图片', imgObj.imgName, '失败!'));
                                             }
                                             imgLength--;
-                                        } else{
-                                            Reject();
+                                        } else {
+                                            Reject('图片上传接口无法正常使用');
                                         }
                                         //判断图片队列是否已全部上传过
                                         if (imgLength === 0) {
